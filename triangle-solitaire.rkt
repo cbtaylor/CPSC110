@@ -1,0 +1,136 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname triangle-solitaire) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ())))
+;; Board is (listof Boolean) that is 15 elements long
+;; interp. true means peg in hole
+;;         false means hole empty
+;;  Visually a board is a triangular array of circles
+;;  A valid starting board has only one empty hole
+
+;; Position is Natural[0,14]
+
+(define T true)
+(define F false)
+
+
+(define BD1 (build-list 15 (lambda (p) (not (= p 0)))))
+(define BD1s (build-list 15 (lambda (p) (= p 12))))
+(define BD2 (build-list 15 (lambda (p) (not (= p 4)))))
+
+;;           0
+;;         1   2
+;;       3   4   5
+;;     6   7   8   9
+;;   10  11  12  13  14
+(define POSITIONS (list 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14))
+
+(define-struct jump (from over to))
+;; Jump is (make-jump Position Position Position)
+;; interp. a possible jump on the board
+;;         a jump is only valid if there is a peg in from
+;;         a peg in over and no peg in to
+
+(define J01 (make-jump 0 1 3))
+(define J02 (make-jump 3 1 0))
+(define J03 (make-jump 1 3 6))
+(define J04 (make-jump 6 3 1))
+(define J05 (make-jump 3 6 10))
+(define J06 (make-jump 10 6 3))
+(define J07 (make-jump 2 4 7))
+(define J08 (make-jump 7 4 2))
+(define J09 (make-jump 4 7 11))
+(define J10 (make-jump 11 7 4))
+(define J11 (make-jump 5 8 12))
+(define J12 (make-jump 12 8 5))
+
+(define J13 (make-jump 0 2 5))
+(define J14 (make-jump 5 2 0))
+(define J15 (make-jump 2 5 9))
+(define J16 (make-jump 9 5 2))
+(define J17 (make-jump 5 9 14))
+(define J18 (make-jump 14 9 5))
+(define J19 (make-jump 1 4 8))
+(define J20 (make-jump 8 4 1))
+(define J21 (make-jump 4 8 13))
+(define J22 (make-jump 13 8 4))
+(define J23 (make-jump 3 7 12))
+(define J24 (make-jump 12 7 3))
+
+(define J25 (make-jump 10 11 12))
+(define J26 (make-jump 12 11 10))
+(define J27 (make-jump 11 12 13))
+(define J28 (make-jump 13 12 11))
+(define J29 (make-jump 12 13 14))
+(define J30 (make-jump 14 13 12))
+(define J31 (make-jump 6 7 8))
+(define J32 (make-jump 8 7 6))
+(define J33 (make-jump 7 8 9))
+(define J34 (make-jump 9 8 7))
+(define J35 (make-jump 3 4 5))
+(define J36 (make-jump 5 4 3))
+
+(define JUMPS
+  (list J01 J02 J03 J04 J05 J06
+        J07 J08 J09 J10 J11 J12
+        J13 J14 J15 J16 J17 J18
+        J19 J20 J21 J22 J23 J24
+        J25 J26 J27 J28 J29 J30
+        J31 J32 J33 J34 J35 J36))
+
+;; Functions:
+
+;; Board -> Board or false
+;; produce solution for given board, or false if impossible
+;!!!(check-expect (solve BD1) BD1s)
+
+;(define (solve bd) false) ;stub
+
+;; template as backtracking search over generated arbitrary arity tree
+
+;; arb ari tree first
+(define (solve bd)
+  (local [(define (solve-bd bd)
+            (if (solved? bd)
+                     bd
+                     (solve-lobd (next-boards bd))))
+            
+          (define (solve-lobd lobd)
+            (cond [(empty? lobd) false]
+                  [else
+                   (local [(define try (solve-bd (first lobd)))]
+                     (if (not (false? try))
+                         try
+                        (solve-lobd (rest lobd))))]))]
+  
+          (solve-bd bd)))
+          
+
+;; Board -> Boolean
+;; produce true if bd has only one peg
+(check-expect (solved? BD1) false)
+(check-expect (solved? BD1s) true)
+
+(define (solved? bd)
+  (local [(define (true?  p) (not (false? p)))]
+  (= (length (filter identity bd)) 1)))
+
+;; Board -> (listof Board)
+;; produce a list of all possible valid next boards
+;;!!!
+(define (next-boards bd) empty)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
